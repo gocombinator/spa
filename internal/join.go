@@ -16,6 +16,8 @@ func Join(values any, sep string) string {
 				return v
 			case fmt.Stringer:
 				return v.String()
+			case []any:
+				return Join(v, sep)
 			default:
 				panic(fmt.Sprintf("unexpected type %T", v))
 			}
