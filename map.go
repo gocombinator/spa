@@ -1,12 +1,24 @@
 package spa
 
-// Map changes parser's result to new value.
-func Map[T, U any](p Parser, f func(T) U) Parser {
-	return func(in string) Result {
-		if r := p(in); r.Error == nil {
-			return Ok(r.Input, f(r.Value.(T)))
-		} else {
-			return r
+import "fmt"
+
+// Map changes result from slice of key values to map.
+//
+//	p -> [..[k,v]] -> map[k]v
+func Map[K comparable, V any](p Parser) Parser {
+	return As(p, func(kvs []any) map[K]V {
+		var m = make(map[K]V, len(kvs))
+		for _, kv := range kvs {
+			switch kv := kv.(type) {
+			case nil:
+			case []any:
+				m[kv[0].(K)] = kv[1].(V)
+			case [2]any:
+				m[kv[0].(K)] = kv[1].(V)
+			default:
+				panic(fmt.Sprintf("unexpected type %T", kv))
+			}
 		}
-	}
+		return m
+	})
 }
