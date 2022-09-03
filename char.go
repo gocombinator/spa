@@ -1,5 +1,7 @@
 package spa
 
+import "github.com/gocombinator/spa/internal"
+
 // Char matches single rune based on provided pattern returning string.
 //
 // Example pattern:
@@ -24,32 +26,30 @@ package spa
 // - ranges are between even and odd strings only
 //
 // As convention it's recommended to write pair of strings per line - as each line defines single range.
-func Char(list ...string) Parser {
+func Char(patterns ...string) Parser {
 
 	// Map strings to runes outside of parser.
-	var list_ [][]rune = make([][]rune, len(list))
-	for i, s := range list {
-		list_[i] = []rune(s)
+	var list [][]rune = make([][]rune, len(patterns))
+	for i, s := range patterns {
+		list[i] = []rune(s)
 	}
 
 	return func(in string) Result {
 		for _, r := range in {
 			var prev rune
-			for i, chars := range list_ {
+			for i, chars := range list {
 
 				// Check range.
 				if i%2 == 1 {
 					if r >= prev && r <= chars[0] {
-						var s = string(r)
-						return Ok(in[len(s):], s)
+						return Eat(in, len(string(r)))
 					}
 				}
 
 				// Check every char.
 				for _, c := range chars {
 					if r == c {
-						var s = string(r)
-						return Ok(in[len(s):], s)
+						return Eat(in, len(string(r)))
 					}
 				}
 
@@ -59,6 +59,6 @@ func Char(list ...string) Parser {
 			//lint:ignore SA4004 we're range-ing to avoid whole input to rune conversion
 			break
 		}
-		return Errorf("expected one of chars")
+		return Errorf(in, "expected one of %s chars", internal.ReadablePatterns(patterns...))
 	}
 }

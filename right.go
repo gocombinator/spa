@@ -1,8 +1,12 @@
 package spa
 
-// Right matches pair of parsers in sequence returning second one's result.
-func Right(p Parser, q Parser) Parser {
-	return Map(Pair(p, q), func(vs [2]any) any {
+// Right matches pair of parsers in sequence returning second's result.
+//
+//	l / r -> r
+//
+// See [Left].
+func Right(l Parser, r Parser) Parser {
+	return As(Pair(l, r), func(vs [2]any) any {
 		return vs[1]
 	})
 }

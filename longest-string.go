@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-// LongestString returns parser that matches longest string from given list.
+// LongestString matches longest string from given list.
 // See [FirstString] for different strategy.
 func LongestString(values []string) Parser {
 
@@ -16,9 +16,9 @@ func LongestString(values []string) Parser {
 	return func(in string) Result {
 		for _, value := range sorted {
 			if strings.HasPrefix(in, value) {
-				return Ok(in[len(value):], value)
+				return Eat(in, len(value))
 			}
 		}
-		return Errorf("expected longest of %d strings", len(sorted))
+		return Errorf(in, "expected longest of %s strings", strings.Join(sorted, " / "))
 	}
 }

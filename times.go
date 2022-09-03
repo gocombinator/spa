@@ -1,22 +1,24 @@
 package spa
 
-// Times matches parser n times.
-// See [Repeat] and [Repeat0] for alternative parsers.
+// Times matches between n and m times.
+//
+//	p{n,m} -> [..p]
+//
+// See [Times], [Repeat] or [Repeat0] for alternative parsers.
 // See [MinLen] for related result constraint.
-func Times(n int, p Parser) Parser {
-	return func(in string) Result {
+func Times(n, m int, p Parser) Parser {
+	return func(in string) (r Result) {
 		var values []any
+		r.Input = in
 		for i := 0; i < n; i++ {
-			if r := p(in); r.Error == nil {
+			if r = p(r.Input); r.Err == nil {
 				values = append(values, r.Value)
-				in = r.Input
-			} else {
-				break
 			}
 		}
-		if len(values) == n {
+		var l = len(values)
+		if n <= l && l <= m {
 			return Ok(in, values)
 		}
-		return Errorf("expected %d times, got %d", n, len(values))
+		return r.Errorf("expected between %d-%d times, got %d last error", n, m, l)
 	}
 }
