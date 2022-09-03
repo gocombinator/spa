@@ -7,11 +7,15 @@ import (
 
 func Join(values any, sep string) string {
 	switch values := values.(type) {
+	case nil:
+		return ""
 	case []string:
 		return strings.Join(values, sep)
 	case []any:
 		return Join(Slicemap(values, func(v any) string {
 			switch v := v.(type) {
+			case nil:
+				return ""
 			case string:
 				return v
 			case fmt.Stringer:
