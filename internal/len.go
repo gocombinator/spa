@@ -5,6 +5,8 @@ import "fmt"
 // Len returns length of any value.
 func Len(value any) int {
 	switch v := value.(type) {
+	case nil:
+		return 0
 	case string:
 		return len(v)
 	case []any:
