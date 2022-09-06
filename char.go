@@ -63,6 +63,9 @@ func Char(patterns ...string) Parser {
 			prev = chars[len(chars)-1]
 		}
 
+		if len(patterns) == 1 && len([]rune(patterns[0])) == 1 {
+			return nil, 0, fmt.Errorf("char %q not found - %s", patterns[0], in)
+		}
 		return nil, 0, fmt.Errorf("expected one of %s chars", internal.ReadablePatterns(patterns...))
 	}
 }
