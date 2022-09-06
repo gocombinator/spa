@@ -4,11 +4,11 @@ package spa
 //
 //	a / b -> a|b
 func Either(a, b Parser) Parser {
-	return func(in string) Result {
-		r := a(in)
-		if r.Err == nil {
-			return r
+	return func(in string) (any, int, error) {
+		if v, in_, err := a(in); err == nil {
+			return v, in_, nil
+		} else {
+			return b(in)
 		}
-		return b(in)
 	}
 }

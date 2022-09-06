@@ -1,8 +1,8 @@
 package spa
 
 // Label converts slice result into a map.
-func Label(p Parser, labels ...string) Parser {
-	return As(p, func(v []any) map[string]any {
+func Label(labels ...string) func(Parser) Parser {
+	return As(func(v []any) map[string]any {
 		var m = make(map[string]any)
 		for i, label := range labels {
 			if label != "" {

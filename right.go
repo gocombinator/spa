@@ -5,8 +5,9 @@ package spa
 //	l / r -> r
 //
 // See [Left].
-func Right(l Parser, r Parser) Parser {
-	return As(Pair(l, r), func(vs [2]any) any {
-		return vs[1]
-	})
+func Right(l, r Parser) Parser {
+	return Pipe(
+		Pair(l, r),
+		Pick(1),
+	)
 }

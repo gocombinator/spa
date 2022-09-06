@@ -4,7 +4,10 @@ package spa
 //
 //	a / b -> a
 func Left(a Parser, b Parser) Parser {
-	return As(Pair(a, b), func(vs [2]any) any {
-		return vs[0]
-	})
+	return Pipe(
+		Pair(a, b),
+		As(func(vs [2]any) any {
+			return vs[0]
+		}),
+	)
 }

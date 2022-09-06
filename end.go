@@ -1,10 +1,12 @@
 package spa
 
+import "fmt"
+
 // End matches end of input.
-func End(in string) Result {
+func End(in string) (any, int, error) {
 	if in == "" {
-		return Empty("")
+		return nil, 0, nil
 	} else {
-		return Errorf(in, "expected end of input")
+		return nil, 0, fmt.Errorf("expected end of input")
 	}
 }

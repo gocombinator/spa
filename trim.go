@@ -1,13 +1,21 @@
 package spa
 
 // Trim ignores leading and trailing part.
-// If no trim parsers are provided, whitespaces are trimmed.
-func Trim(p Parser, trims ...Parser) Parser {
-	return func(in string) Result {
-		if len(trims) == 0 {
-			return Pick(Seq(Ws0, p, Ws0), 1)(in)
-		}
-		var q = Repeat0(Or(trims...))
-		return Pick(Seq(q, p, q), 1)(in)
+//
+// If there are no trim parser(s) provided, [Ws0] is used.
+//
+// If single trim parser is provied, it is matched at both ends as is.
+// For optional trim you want to pass single zero-width-succeeding parser.
+//
+// If more trim parsers are provided, they're [Or]'ed and [Repeat0]'ed.
+// In this case none of trim parsers should be zero-width-succeeding.
+func Trim(ps ...Parser) Mapper {
+	if len(ps) == 0 {
+		return Wrap(Ws0, Ws0)
 	}
+	if len(ps) == 1 {
+		return Wrap(ps[0], ps[0])
+	}
+	var p = Repeat0(Or(ps...))
+	return Wrap(p, p)
 }

@@ -1,8 +1,8 @@
 package spa
 
 // Pick chooses single, ith result value or a list of result values if more indices are provided.
-func Pick(p Parser, i int, indices ...int) Parser {
-	return As(p, func(vs []any) any {
+func Pick(i int, indices ...int) Mapper {
+	return As(func(vs []any) any {
 		if len(indices) == 0 {
 			return vs[i]
 		}

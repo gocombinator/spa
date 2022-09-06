@@ -1,13 +1,15 @@
 package spa
 
+import "fmt"
+
 // Or `p[0] / .. / p[n-1] -> p[0]|..|p[n-1]` matches first parser from provided list.
 func Or(ps ...Parser) Parser {
-	return func(in string) (r Result) {
+	return func(in string) (any, int, error) {
 		for _, p := range ps {
-			if r = p(in); r.Err == nil {
-				return r
+			if v, w, err := p(in); err == nil {
+				return v, w, nil
 			}
 		}
-		return r.Errorf("in or none of %d parsers matched (last error)", len(ps))
+		return nil, 0, fmt.Errorf("in or none of %d parsers matched", len(ps))
 	}
 }

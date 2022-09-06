@@ -2,4 +2,4 @@ package spa
 
 // Ws1 matches one or more whitespace characters.
 // See [Ws0] for zero or more.
-var Ws1 = MinLen(1, Ws0)
+var Ws1 = Repeat(Ws)

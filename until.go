@@ -8,10 +8,13 @@ package spa
 //
 // Use [Min] to limit minimum length.
 func Until(p Parser) Parser {
-	return func(in string) Result {
-		for i := range in {
-			if p(in[i:]).Err == nil {
-				return Eat(in, i)
+	return func(in string) (any, int, error) {
+		var o = 0
+		for {
+			if _, w, err := p(in[o:]); err == nil && w > 0 {
+				o += w
+			} else {
+				return in[:o], o, nil
 			}
 		}
 		return Rest(in)

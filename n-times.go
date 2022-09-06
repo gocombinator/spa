@@ -1,27 +1,31 @@
 package spa
 
+import "fmt"
+
 // NTimes matches n times.
 //
 //	p{n} -> []p
 //
 // See [Repeat] and [Repeat0] for alternative parsers.
 // See [MinLen] for related result constraint.
-func NTimes(n int, p Parser) Parser {
-	return func(in string) Result {
-		var err error
-		var values []any
-		for i := 0; i < n; i++ {
-			if r := p(in); r.Err == nil {
-				values = append(values, r.Value)
-				in = r.Input
-			} else {
-				err = r.Err
-				break
+func NTimes(times int) func(Parser) Parser {
+	return func(p Parser) Parser {
+		return func(in string) (any, int, error) {
+			var err error
+			var values []any
+			var o = 0
+			for i := 0; i < times; i++ {
+				if v, w, err := p(in); err == nil {
+					values = append(values, v)
+					o += w
+				} else {
+					break
+				}
 			}
+			if len(values) == times {
+				return values, o, nil
+			}
+			return nil, 0, fmt.Errorf("expected %d times, got %d; last error %w", times, len(values), err)
 		}
-		if len(values) == n {
-			return Ok(in, values)
-		}
-		return Errorf(in, "expected %d times, got %d; last error %w", n, len(values), err)
 	}
 }

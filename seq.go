@@ -1,19 +1,22 @@
 package spa
 
+import "fmt"
+
 // Seq matches parsers one by one in sequence.
 //
 //	a / .. / z  -> [a, .., z]
 func Seq(ps ...Parser) Parser {
-	return func(in string) Result {
+	return func(in string) (any, int, error) {
 		var values []any
+		var o = 0
 		for i, p := range ps {
-			if r := p(in); r.Err == nil {
-				values = append(values, r.Value)
-				in = r.Input
+			if v, w, err := p(in[o:]); err == nil {
+				values = append(values, v)
+				o += w
 			} else {
-				return r.Errorf("in %d/%d seq", i+1, len(ps))
+				return nil, 0, fmt.Errorf("in %d/%d seq", i+1, len(ps))
 			}
 		}
-		return Ok(in, values)
+		return values, o, nil
 	}
 }

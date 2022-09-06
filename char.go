@@ -1,6 +1,11 @@
 package spa
 
-import "github.com/gocombinator/spa/internal"
+import (
+	"fmt"
+	"unicode/utf8"
+
+	"github.com/gocombinator/spa/internal"
+)
 
 // Char matches single rune based on provided pattern returning string.
 //
@@ -34,31 +39,30 @@ func Char(patterns ...string) Parser {
 		list[i] = []rune(s)
 	}
 
-	return func(in string) Result {
-		for _, r := range in {
-			var prev rune
-			for i, chars := range list {
+	return func(in string) (any, int, error) {
+		var r, _ = utf8.DecodeRuneInString(in)
+		var prev rune
+		for i, chars := range list {
 
-				// Check range.
-				if i%2 == 1 {
-					if r >= prev && r <= chars[0] {
-						return Eat(in, len(string(r)))
-					}
+			// Check range.
+			if i%2 == 1 {
+				if r >= prev && r <= chars[0] {
+					var s = string(r)
+					return s, len(s), nil
 				}
-
-				// Check every char.
-				for _, c := range chars {
-					if r == c {
-						return Eat(in, len(string(r)))
-					}
-				}
-
-				prev = chars[len(chars)-1]
 			}
 
-			//lint:ignore SA4004 we're range-ing to avoid whole input to rune conversion
-			break
+			// Check every char.
+			for _, c := range chars {
+				if r == c {
+					var s = string(r)
+					return s, len(s), nil
+				}
+			}
+
+			prev = chars[len(chars)-1]
 		}
-		return Errorf(in, "expected one of %s chars", internal.ReadablePatterns(patterns...))
+
+		return nil, 0, fmt.Errorf("expected one of %s chars", internal.ReadablePatterns(patterns...))
 	}
 }

@@ -1,14 +1,28 @@
 package spa
 
-// List matches sep-separated elements.
+// MaybeList matches sep-separated elements.
 //
 //	(p (sep p)*)? -> [..p]
-func List(p, sep Parser) Parser {
-	return func(in string) Result {
-		if r := p(in); r.Err == nil {
-			return valueTail(r.Value, Right(sep, p))(r.Input)
-		} else {
-			return Empty(in)
+func MaybeList(sep Parser) Mapper {
+	return func(p Parser) Parser {
+		return func(in string) (any, int, error) {
+			if v, w, err := p(in); err == nil {
+				var vs = make([]any, 1)
+				vs[0] = v
+				var o = w
+				var q = Right(sep, p)
+				for {
+					if v, w, err := q(in[o:]); err == nil {
+						vs = append(vs, v)
+						o += w
+					} else {
+						break
+					}
+				}
+				return vs, o, nil
+			} else {
+				return nil, 0, nil
+			}
 		}
 	}
 }

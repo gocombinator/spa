@@ -8,10 +8,13 @@ import (
 )
 
 func ExampleAs() {
-	var num = spa.As(spa.Chars("0", "9"), func(s string) int {
-		n, _ := strconv.Atoi(s)
-		return n
-	})
+	var num = spa.Pipe(
+		spa.Chars("0", "9"),
+		spa.As(func(s string) int {
+			n, _ := strconv.Atoi(s)
+			return n
+		}),
+	)
 	var parse = spa.Make[int](num)
 	if r, err := parse("123"); err == nil {
 		fmt.Printf("%d (%T)", r, r)
