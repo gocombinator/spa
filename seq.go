@@ -14,7 +14,7 @@ func Seq(ps ...Parser) Parser {
 				values = append(values, v)
 				o += w
 			} else {
-				return nil, 0, fmt.Errorf("in %d/%d seq", i+1, len(ps))
+				return nil, 0, fmt.Errorf("in %d/%d seq, %w", i+1, len(ps), err)
 			}
 		}
 		return values, o, nil
